@@ -110,7 +110,7 @@ lr = 5e-05
 n_epochs = 300
 n_shape_coeff = 2
 trained_params_dir = 'None'
-case_number = 0
+case_number = 16
 
 
 create_vtu_tri(data_path, K, n_shape_coeff, n_epochs, lr, trained_params_dir, fixed_geom, dir_label, case_number)

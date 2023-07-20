@@ -57,6 +57,10 @@ real_node_features_train_raw = np.load('data/beamData/rawData/train/real-node-fe
 shape_coeffs_train_raw = np.load('data/beamData/rawData/train/shape-coeffs.npy')
 node_layer_labels = np.load('data/beamData/topologyData/node-layer-labels.npy')
 sparse_topology = np.load('data/beamData/topologyData/sparse-topology.npy')
+augmented_topology = np.load('data/beamData/topologyData/augmented-topology.npy')
+
+
+np.savetxt("sparse_topology.csv", sparse_topology, fmt='%f', delimiter=",")
 
 
 

@@ -248,6 +248,13 @@ def calculate_virtual_nodes_and_edges(real_nodes: np.array,
         # calculate connectivty between the leaf and root nodes
         leaf_root_topology = inter_layer_topology(leaf_node_indices, root_node_indices)
 
+        center_point_method_flag = False
+        if center_point_method_flag:
+            leaf_root_indices = sorted(np.random.choice(np.ravel(leaf_node_indices),
+                                                        size=int(np.round(0.5*len(leaf_node_indices))), replace=False))
+            root_node_indices = np.full_like(leaf_root_indices, shift_value)
+            leaf_root_topology = np.column_stack((leaf_root_indices, root_node_indices))
+
         # calculate connectivity between the root nodes using "n_nearest_nbrs"
         if layer_num < n_virtual_node_layers:
             root_root_topology = intra_layer_topology(root_nodes, n_nearest_nbrs, shift_value)
@@ -341,6 +348,35 @@ def generate_augmented_topology(data_dir: str,
     # load the topology of these nodes
     real_topology = np.load(f'{data_dir}/topologyData/real-node-topology.npy').astype(np.int32)
     logging.info(f'real_topology.shape: {real_topology.shape}\n')
+
+    reduced_real_topoloty_flag = True
+    if reduced_real_topoloty_flag:
+        rep_real_nodes[:, 1] = rep_real_nodes[:, 1] / rep_real_nodes[-1, 1] * rep_real_nodes[
+            -1, 0] * 7 / 11
+
+        reduced_real_topology = []
+        threshold_topology = np.linalg.norm(rep_real_nodes[0] - rep_real_nodes[1])
+        for i in range(rep_real_nodes.shape[0]):
+            for j in range(rep_real_nodes.shape[0]):
+                if i != j and np.linalg.norm(rep_real_nodes[i] - rep_real_nodes[j]) < 1.1 * threshold_topology:
+                    reduced_real_topology.append([i, j])
+
+        real_topology = np.asarray(reduced_real_topology)
+
+    center_point_self_flag = True
+    if center_point_self_flag:
+        center_point = np.mean(rep_real_nodes, axis=0)
+        distances_to_center_point = np.sqrt(np.sum((rep_real_nodes - center_point) ** 2, axis=1))
+        closest_index_to_center = np.argmin(distances_to_center_point)
+        leaf_center_indices = sorted(np.random.choice(np.linspace(0,rep_real_nodes.shape[0]-1, rep_real_nodes.shape[0], dtype=int),
+                                                    size=int(np.round(1 * rep_real_nodes.shape[0])), replace=False))
+        leaf_center_indices = [x for x in leaf_center_indices if x != closest_index_to_center]
+        root_center_indices = np.full_like(leaf_center_indices, closest_index_to_center)
+        sparce_center_topology = np.column_stack((leaf_center_indices, root_center_indices))
+        reverse_center_topology = np.concatenate((sparce_center_topology[:, 1:2], sparce_center_topology[:, 0:1]), axis=1)
+        real_center_topology = np.concatenate((sparce_center_topology, reverse_center_topology), axis=0)
+
+        real_topology = np.concatenate((real_topology, real_center_topology), axis=0)
 
     # calculate the virtual nodes and edges of the augmented graph using Algorithm 2 of the manuscript
     results_tuple = calculate_virtual_nodes_and_edges(rep_real_nodes, real_topology, n_nearest_nbrs, n_nodes_per_layer, n_leaves, min_root_nodes)
