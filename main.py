@@ -49,7 +49,7 @@ to evaluate the out of sample predictive performance of the emulator
 #############################################################################
 
 import jax
-jax.config.update('jax_array', True)
+# jax.config.update('jax_array', True)
 from jax import random, jit, numpy as jnp
 import numpy as np
 
@@ -60,6 +60,8 @@ from flax.metrics import tensorboard
 
 import data_utils as data_utils
 import utils
+
+import time
 
 import functools
 
@@ -259,6 +261,7 @@ def train(data_path, K, n_shape_coeff, n_epochs, lr, trained_params_dir, fixed_g
     logging.info(f'Learning rate: {lr}')
     logging.info(f'Trained Params Dir: {trained_params_dir}')
     logging.info(f'Fixed LV geom: {fixed_geom}\n')
+    start_time = time.time()
 
     # load train data
     train_data = data_utils.DataLoader(data_path, 'train', n_shape_coeff, fixed_geom)
@@ -326,6 +329,8 @@ def train(data_path, K, n_shape_coeff, n_epochs, lr, trained_params_dir, fixed_g
 
     summary_writer.flush()
     logging.info(f'Finish training')
+    duration_time = time.time() - start_time
+    logging.info(f"The duration is {duration_time:.2f} seconds")
 
 def evaluate(data_path, K, n_shape_coeff, n_epochs, lr, trained_params_dir, fixed_geom, dir_label):
 

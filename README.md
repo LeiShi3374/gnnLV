@@ -9,7 +9,7 @@ Experiments were performed with ``Python`` version 3.9.7, ``JAX`` version 0.3.16
 ```
 conda create --name gnnEmulEnv python=3.9.7
 conda activate gnnEmulEnv
-pip install "jax[cuda]==0.3.16" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+pip install "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 pip install --upgrade -r requirements.txt
 ```
 
